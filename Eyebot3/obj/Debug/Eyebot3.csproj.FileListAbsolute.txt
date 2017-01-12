@@ -1,0 +1,5 @@
+c:\users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\Eyebot3\bin\Debug\Eyebot3.exe.config
+c:\users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\Eyebot3\bin\Debug\Eyebot3.exe
+c:\users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\Eyebot3\bin\Debug\Eyebot3.pdb
+c:\users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\Eyebot3\obj\Debug\Eyebot3.exe
+c:\users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\Eyebot3\obj\Debug\Eyebot3.pdb
