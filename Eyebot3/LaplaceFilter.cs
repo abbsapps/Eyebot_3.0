@@ -23,10 +23,14 @@ namespace Eyebot3
             {
                 for (int j = -1; j < 2; j++)
                 {
-                    sumDifference += Math.Abs(pixelVal - getBrightness(image.GetPixel(xLoc + 1, yLoc + j)));
+                    var otherBrightness = getBrightness(image.GetPixel(xLoc + i, yLoc + j));
+                    sumDifference += Math.Abs(pixelVal - otherBrightness);
                 }
             }
-            return (int)(sumDifference / 9.0);
+            //sharpener experimentation
+            sumDifference = (int)(Math.Pow(sumDifference / (255.0*8.0), .5) * (255*8));
+            //end sharpener
+            return (int)(sumDifference / 8.0);
         }
 
         public int getBrightness(Color pixel)
