@@ -28,11 +28,14 @@ namespace Eyebot3
         {
             var centerBrightness = getAreaBrightness(0, centerResolution, xLoc, yLoc, image);
             var surroundBrightness = getAreaBrightness(centerResolution, surroundResolution, xLoc, yLoc, image);
-            return Math.Abs(centerBrightness - surroundBrightness);
 
             //sharpener experimentation
-            //sumSurroundDifference = (int)(Math.Pow(sumSurroundDifference / (255.0 * surroundPixelCount), .5) * (255 * surroundPixelCount));
+            var sumDifference = Math.Abs(centerBrightness - surroundBrightness);
             //end sharpener
+
+            return Math.Abs(centerBrightness - surroundBrightness);
+
+
         }
 
 
