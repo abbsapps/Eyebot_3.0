@@ -19,9 +19,9 @@ namespace Eyebot3
             Bitmap copiedImage = new Bitmap(environmentImage.Width, environmentImage.Height);
             Bitmap doubleCopiedImage = new Bitmap(environmentImage.Width, environmentImage.Height);
             //laplace
-            for (int i = 1; i < mappedImage.Width - 1; i++)
+            for (int i = 5; i < mappedImage.Width - 5; i++)
             {
-                for (int j = 1; j < mappedImage.Height - 1; j++)
+                for (int j = 5; j < mappedImage.Height - 5; j++)
                 {
                     //var brightness = (int)(mappedImage.GetPixel(i, j).GetBrightness() * 255);
                     var brightness = laplaceFilter.getLaplaceBrightness(mappedImage, i, j);
@@ -31,9 +31,9 @@ namespace Eyebot3
             copiedImage.Save(System.IO.Directory.GetCurrentDirectory() + "/Images/laplaced.png");
 
             //double laplace
-            for (int i = 1; i < copiedImage.Width - 1; i++)
+            for (int i = 5; i < copiedImage.Width - 5; i++)
             {
-                for (int j = 1; j < copiedImage.Height - 1; j++)
+                for (int j = 5; j < copiedImage.Height - 5; j++)
                 {
                     //var brightness = (int)(mappedImage.GetPixel(i, j).GetBrightness() * 255);
                     var brightness = laplaceFilter.getLaplaceBrightness(copiedImage, i, j);

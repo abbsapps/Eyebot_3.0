@@ -16,26 +16,49 @@ namespace Eyebot3
 
         public int getLaplaceBrightness(Bitmap image, int xLoc, int yLoc)
         {
-
-            var sumDifference = 0;
-            var pixelVal = getBrightness(image.GetPixel(xLoc, yLoc));
-            for (int i = -1; i < 2; i++)
-            {
-                for (int j = -1; j < 2; j++)
-                {
-                    var otherBrightness = getBrightness(image.GetPixel(xLoc + i, yLoc + j));
-                    sumDifference += Math.Abs(pixelVal - otherBrightness);
-                }
-            }
-            //sharpener experimentation
-            sumDifference = (int)(Math.Pow(sumDifference / (255.0*8.0), .5) * (255*8));
-            //end sharpener
-            return (int)(sumDifference / 8.0);
+            return (getLaplaceVal(1, 2, xLoc, yLoc, image));
         }
 
         public int getBrightness(Color pixel)
         {
             return (int)(pixel.GetBrightness() * 255);
+        }
+
+        public int getLaplaceVal(int centerResolution, int surroundResolution, int xLoc, int yLoc, Bitmap image)
+        {
+            var centerBrightness = getAreaBrightness(0, centerResolution, xLoc, yLoc, image);
+            var surroundBrightness = getAreaBrightness(centerResolution, surroundResolution, xLoc, yLoc, image);
+            return Math.Abs(centerBrightness - surroundBrightness);
+
+            //sharpener experimentation
+            //sumSurroundDifference = (int)(Math.Pow(sumSurroundDifference / (255.0 * surroundPixelCount), .5) * (255 * surroundPixelCount));
+            //end sharpener
+        }
+
+
+
+
+
+        public int getAreaBrightness(int skipResolution, int getResolution, int xLoc, int yLoc, Bitmap image)
+        {
+            var sumGetBrightness = 0;
+            var skipPixelCount = skipResolution == 0 ? 0 : Math.Pow(skipResolution * 2 - 1, 2);
+            var getPixelCount = Math.Pow(getResolution * 2 - 1, 2) - skipPixelCount;
+            for (int i = -1 * getResolution + 1; i < getResolution; i++)
+            {
+                for (int j = -1 * getResolution + 1; j < getResolution; j++)
+                {
+                    if (i > -1 * skipResolution && i < skipResolution && j > -1 * skipResolution && j < skipResolution)
+                    {
+                        sumGetBrightness += 0;
+                    }
+                    else
+                    {
+                        sumGetBrightness += getBrightness(image.GetPixel(xLoc + i, yLoc + j));
+                    }
+                }
+            }
+            return (int)(sumGetBrightness / getPixelCount);
         }
     }
 }
