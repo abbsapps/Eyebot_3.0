@@ -1,0 +1,8 @@
+c:\Users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\UnitTestProject1\bin\Debug\EyebotTests.dll
+c:\Users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\UnitTestProject1\bin\Debug\EyebotTests.pdb
+c:\Users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\UnitTestProject1\bin\Debug\Eyebot3.exe
+c:\Users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\UnitTestProject1\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+c:\Users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\UnitTestProject1\bin\Debug\Eyebot3.pdb
+c:\Users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\UnitTestProject1\obj\Debug\Eyebot Tests.csprojResolveAssemblyReference.cache
+c:\Users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\UnitTestProject1\obj\Debug\EyebotTests.dll
+c:\Users\patrickabbs\documents\visual studio 2015\Projects\Eyebot3\UnitTestProject1\obj\Debug\EyebotTests.pdb
