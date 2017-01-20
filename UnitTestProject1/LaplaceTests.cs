@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using Eyebot3;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTestProject1
@@ -27,10 +28,22 @@ namespace UnitTestProject1
             var laplaceFilterer = new LaplaceFilter();
             var testImage = TestBitmap();
 
-            var areaBrightness = (int)laplaceFilterer.getLaplaceVal(0, 1, 4, 4, testImage);
+            var areaBrightnessOnePixelLaplaced = (int)laplaceFilterer.getLaplaceVal(0, 1, 4, 4, testImage);
             var pixelBrightness = (int)(testImage.GetPixel(4, 4).GetBrightness() * 255);
 
-            Assert.AreEqual(areaBrightness, pixelBrightness);
+            var areaBrightnessTwoPixelsLaplaced = (int)laplaceFilterer.getLaplaceVal(0, 2, 4, 4, testImage);
+            var areaBrightnessTwoPixels = 0.0;
+            for(int i = 3; i < 6; i++)
+            {
+                for(int j = 3; j < 6; j++)
+                {
+                    areaBrightnessTwoPixels += testImage.GetPixel(i, j).GetBrightness() * 255;
+                }
+            }
+            areaBrightnessTwoPixels = (int)(areaBrightnessTwoPixels / 9);
+
+            Assert.AreEqual(areaBrightnessOnePixelLaplaced, pixelBrightness);
+            Assert.AreEqual(areaBrightnessTwoPixelsLaplaced, areaBrightnessTwoPixels);
         }
     }
 }
