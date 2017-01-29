@@ -28,14 +28,15 @@ namespace Eyebot3
         {
             var centerBrightness = getAreaBrightness(centerResolution, xLoc, yLoc, image);
 
-            //sharpener experimentation
-            //var sumDifference = Math.Abs(centerBrightness - surroundBrightness);
-            //end sharpener
+            var rawContrast = getSurroundContrast(centerResolution, surroundResolution, xLoc, yLoc, centerBrightness, image);
 
-            return (getSurroundContrast(centerResolution, surroundResolution, xLoc, yLoc, centerBrightness, image));
+            return (laplaceSharpener(rawContrast, .5));
         }
 
-
+        public int laplaceSharpener(int inputBrightness, double sharpness)
+        {
+            return (int)(Math.Pow((inputBrightness / 255.0), sharpness) * 255.0);
+        }
 
         public int getSurroundContrast(int skipResolution, int getResolution, int xLoc, int yLoc, int centerBrightness, Bitmap image)
         {
