@@ -14,23 +14,18 @@ namespace Eyebot3
 
         }
 
-        public int getLaplaceBrightness(Bitmap image, int xLoc, int yLoc)
-        {
-            return (getLaplaceVal(1, 2, xLoc, yLoc, image));
-        }
-
         public int getBrightness(Color pixel)
         {
             return (int)(pixel.GetBrightness() * 255);
         }
 
-        public int getLaplaceVal(int centerResolution, int surroundResolution, int xLoc, int yLoc, Bitmap image)
+        public int getLaplaceVal(int centerResolution, int surroundResolution, double sharpenValue, int xLoc, int yLoc, Bitmap image)
         {
             var centerBrightness = getAreaBrightness(centerResolution, xLoc, yLoc, image);
 
             var rawContrast = getSurroundContrast(centerResolution, surroundResolution, xLoc, yLoc, centerBrightness, image);
 
-            return (laplaceSharpener(rawContrast, .5));
+            return (laplaceSharpener(rawContrast, sharpenValue));
         }
 
         public int laplaceSharpener(int inputBrightness, double sharpness)

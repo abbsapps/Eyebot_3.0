@@ -23,7 +23,7 @@ namespace Eyebot3
             {
                 for (int j = 5; j < mappedImage.Height - 5; j++)
                 {
-                    var brightness = laplaceFilter.getLaplaceBrightness(mappedImage, i, j);
+                    var brightness = laplaceFilter.getLaplaceVal(2, 4, .5, i, j, mappedImage);
                     copiedImage.SetPixel(i, j, Color.FromArgb(255, brightness, brightness, brightness));
                 }
             }
@@ -36,7 +36,7 @@ namespace Eyebot3
                 for (int j = 5; j < copiedImage.Height - 5; j++)
                 {
                     //var brightness = (int)(mappedImage.GetPixel(i, j).GetBrightness() * 255);
-                    var brightness = laplaceFilter.getLaplaceBrightness(copiedImage, i, j);
+                    var brightness = laplaceFilter.getLaplaceVal(2, 4, .5, i, j, mappedImage);
                     doubleCopiedImage.SetPixel(i, j, Color.FromArgb(255, brightness, brightness, brightness));
                 }
             }

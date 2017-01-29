@@ -28,10 +28,10 @@ namespace UnitTestProject1
             var laplaceFilterer = new LaplaceFilter();
             var testImage = TestBitmap();
 
-            var areaBrightnessOnePixelLaplaced = (int)laplaceFilterer.getLaplaceVal(0, 1, 4, 4, testImage);
+            var areaBrightnessOnePixelLaplaced = (int)laplaceFilterer.getLaplaceVal(0, 1, 1, 4, 4, testImage);
             var pixelBrightness = (int)(testImage.GetPixel(4, 4).GetBrightness() * 255);
 
-            var areaBrightnessTwoPixelsLaplaced = (int)laplaceFilterer.getLaplaceVal(0, 2, 4, 4, testImage);
+            var areaBrightnessTwoPixelsLaplaced = (int)laplaceFilterer.getLaplaceVal(0, 2, 1, 4, 4, testImage);
             var areaBrightnessTwoPixels = 0.0;
             for(int i = 3; i < 6; i++)
             {
@@ -44,6 +44,36 @@ namespace UnitTestProject1
 
             Assert.AreEqual(areaBrightnessOnePixelLaplaced, pixelBrightness);
             Assert.AreEqual(areaBrightnessTwoPixelsLaplaced, areaBrightnessTwoPixels);
+        }
+
+        [TestMethod]
+        public void laplaceWithCenter()
+        {
+            var laplaceFilterer = new LaplaceFilter();
+            var testImage = TestBitmap();
+
+            var laplacedSinglePixel = (int)laplaceFilterer.getLaplaceVal(1, 2, 1, 4, 4, testImage);
+            var laplacedDoubleSurround = (int)laplaceFilterer.getLaplaceVal(1, 3, 1, 4, 4, testImage);
+            var laplacedDoubleCenter = (int)laplaceFilterer.getLaplaceVal(2, 3, 1, 4, 4, testImage);
+
+            Assert.AreEqual(12, laplacedSinglePixel);
+            Assert.AreEqual(20, laplacedDoubleSurround);
+            Assert.AreEqual(24, laplacedDoubleCenter);
+        }
+
+        [TestMethod]
+        public void laplaceWithSharpener()
+        {
+            var laplaceFilterer = new LaplaceFilter();
+            var testImage = TestBitmap();
+
+            var laplacedSinglePixel = (int)laplaceFilterer.getLaplaceVal(1, 2, .5, 4, 4, testImage);
+            var laplacedDoubleSurround = (int)laplaceFilterer.getLaplaceVal(1, 3, .5, 4, 4, testImage);
+            var laplacedDoubleCenter = (int)laplaceFilterer.getLaplaceVal(2, 3, .5, 4, 4, testImage);
+
+            Assert.AreEqual(55, laplacedSinglePixel);
+            Assert.AreEqual(71, laplacedDoubleSurround);
+            Assert.AreEqual(78, laplacedDoubleCenter);
         }
     }
 }
