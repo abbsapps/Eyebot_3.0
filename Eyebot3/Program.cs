@@ -28,7 +28,8 @@ namespace Eyebot3
                     copiedImage.SetPixel(i, j, Color.FromArgb(255, brightness, brightness, brightness));
                 }
             }
-            copiedImage.Save(System.IO.Directory.GetCurrentDirectory() + "/Images/laplaced.png");
+            var directory = System.IO.Directory.GetCurrentDirectory();
+            copiedImage.Save(directory + "/Images/laplaced.png");
 
             //double laplace
             for (int i = 5; i < copiedImage.Width - 5; i++)
