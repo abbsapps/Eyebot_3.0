@@ -14,7 +14,7 @@ namespace Eyebot3
 
         }
 
-        public int getBrightness(Color pixel)
+        private int getBrightness(Color pixel)
         {
             return (int)(pixel.GetBrightness() * 255);
         }
@@ -28,12 +28,12 @@ namespace Eyebot3
             return (laplaceSharpener(rawContrast, sharpenValue));
         }
 
-        public int laplaceSharpener(int inputBrightness, double sharpness)
+        private int laplaceSharpener(int inputBrightness, double sharpness)
         {
             return (int)(Math.Pow((inputBrightness / 255.0), sharpness) * 255.0);
         }
 
-        public int getSurroundContrast(int skipResolution, int getResolution, int xLoc, int yLoc, int centerBrightness, Bitmap image)
+        private int getSurroundContrast(int skipResolution, int getResolution, int xLoc, int yLoc, int centerBrightness, Bitmap image)
         {
             var sumContrast = 0;
             var skipPixelCount = skipResolution == 0 ? 0 : Math.Pow(skipResolution * 2 - 1, 2);
@@ -56,7 +56,7 @@ namespace Eyebot3
             return (int)(sumContrast / getPixelCount);
         }
 
-        public int getAreaBrightness(int getResolution, int xLoc, int yLoc, Bitmap image)
+        private int getAreaBrightness(int getResolution, int xLoc, int yLoc, Bitmap image)
         {
             var sumGetBrightness = 0;
             var getPixelCount = Math.Pow(getResolution * 2 - 1, 2);

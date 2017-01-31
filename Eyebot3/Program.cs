@@ -12,23 +12,26 @@ namespace Eyebot3
          static void Main(string[] args)
         {
             LaplaceFilter laplaceFilter = new LaplaceFilter();
-            //Console.WriteLine(System.IO.Directory.GetCurrentDirectory());
-            //Console.ReadLine();
-            Image environmentImage = Image.FromFile(System.IO.Directory.GetCurrentDirectory() + "/Images/eye.jpg");
+            Image environmentImage = Image.FromFile(System.IO.Directory.GetCurrentDirectory() + "/Images/triangles.png");
             Bitmap mappedImage = new Bitmap(environmentImage);
             Bitmap copiedImage = new Bitmap(environmentImage.Width, environmentImage.Height);
             Bitmap doubleCopiedImage = new Bitmap(environmentImage.Width, environmentImage.Height);
             //laplace
+
+            var cornerModule = new CornerModule(mappedImage);
+            cornerModule.laplaceCaller();
+
+            /*
             for (int i = 5; i < mappedImage.Width - 5; i++)
             {
                 for (int j = 5; j < mappedImage.Height - 5; j++)
                 {
-                    var brightness = laplaceFilter.getLaplaceVal(2, 4, .5, i, j, mappedImage);
+                    var brightness = laplaceFilter.getLaplaceVal(2, 3, 1, i, j, mappedImage);
                     copiedImage.SetPixel(i, j, Color.FromArgb(255, brightness, brightness, brightness));
                 }
             }
             var directory = System.IO.Directory.GetCurrentDirectory();
-            copiedImage.Save(directory + "/Images/laplaced.png");
+            copiedImage.Save(directory + "/Images/laplacedTriangle.png");
 
             //double laplace
             for (int i = 5; i < copiedImage.Width - 5; i++)
@@ -36,11 +39,13 @@ namespace Eyebot3
                 for (int j = 5; j < copiedImage.Height - 5; j++)
                 {
                     //var brightness = (int)(mappedImage.GetPixel(i, j).GetBrightness() * 255);
-                    var brightness = laplaceFilter.getLaplaceVal(2, 4, .5, i, j, mappedImage);
+                    var brightness = laplaceFilter.getLaplaceVal(2, 3, 1, i, j, mappedImage);
                     doubleCopiedImage.SetPixel(i, j, Color.FromArgb(255, brightness, brightness, brightness));
                 }
             }
-            doubleCopiedImage.Save(System.IO.Directory.GetCurrentDirectory() + "/Images/doubleLaplaced.png");
+            doubleCopiedImage.Save(System.IO.Directory.GetCurrentDirectory() + "/Images/doubleLaplacedTriangle.png");
+
+            */
         }
     }
 }
