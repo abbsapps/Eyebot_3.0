@@ -49,7 +49,14 @@ namespace Eyebot3
                     }
                     else
                     {
-                        sumContrast += Math.Abs(getBrightness(image.GetPixel(xLoc + i, yLoc + j)) - centerBrightness);
+                        if (xLoc+i >= 0 && yLoc+j >= 0 && xLoc+i < image.Width && yLoc+j < image.Height)
+                        {
+                            sumContrast += Math.Abs(getBrightness(image.GetPixel(xLoc + i, yLoc + j)) - centerBrightness);
+                        }
+                        else
+                        {
+                            getPixelCount -= 1;
+                        }
                     }
                 }
             }
@@ -64,7 +71,14 @@ namespace Eyebot3
             {
                 for (int j = -1 * getResolution + 1; j < getResolution; j++)
                 {
-                    sumGetBrightness += getBrightness(image.GetPixel(xLoc + i, yLoc + j));
+                    if (xLoc+i >= 0 && yLoc+j >= 0 && xLoc+i < image.Width && yLoc+j < image.Height)
+                    {
+                        sumGetBrightness += getBrightness(image.GetPixel(xLoc + i, yLoc + j));
+                    }
+                    else
+                    {
+                        getPixelCount -= 1;
+                    }
                 }
             }
             return (int)(sumGetBrightness / getPixelCount);
