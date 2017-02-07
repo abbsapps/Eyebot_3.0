@@ -41,7 +41,7 @@ namespace Eyebot3
             {
                 return new Tuple<int, int>((int)(die.NextDouble() * xSize), (int)(die.NextDouble() * ySize));
             }
-            var entryChoice = (int)(Math.Pow(die.NextDouble(), 5) * orderedPixels.Count);
+            var entryChoice = (int)(Math.Pow(die.NextDouble(), 3) * orderedPixels.Count);
             var baseEntry = orderedPixels[orderedPixels.Count - entryChoice - 1];
             var chosenX = (int)(die.NextDouble() * 20 - 10);
             var chosenY = (int)(die.NextDouble() * 20 - 10);
@@ -61,9 +61,12 @@ namespace Eyebot3
                 int xLocation = nextLocationTuple.Item1;
                 int yLocation = nextLocationTuple.Item2;
 
-                var pixelBrightness = laplacer.getLaplaceVal(1, 2, .5, xLocation, yLocation, realImage);
+                var pixelSpread = 2;
+                var surroundSpread = 3;
 
-                if (xLocation >= 0 && yLocation >= 0 && xLocation < xSize && yLocation < ySize)
+                var pixelBrightness = laplacer.getLaplaceVal(pixelSpread, surroundSpread, .5, xLocation, yLocation, realImage);
+
+                if (xLocation >= pixelSpread && yLocation >= pixelSpread && xLocation < xSize - pixelSpread && yLocation < ySize - pixelSpread)
                 {
                     var pixelLocation = new Tuple<int, int>(xLocation, yLocation);
                     if (knownPixels.ContainsKey(pixelLocation))
@@ -81,8 +84,13 @@ namespace Eyebot3
                     orderedPixels.Insert(listInsertLocation, pixelLocation);
                     orderedBrightnesses.Insert(listInsertLocation, pixelBrightness);
 
-
-                    perceivedImage.SetPixel(xLocation, yLocation, Color.FromArgb(255, pixelBrightness, pixelBrightness, pixelBrightness));
+                    for (int i = -1 * pixelSpread + 1; i < pixelSpread; i++)
+                    {
+                        for (int j = -1 * pixelSpread + 1; j < pixelSpread; j++)
+                        {
+                            perceivedImage.SetPixel(xLocation + 1, yLocation + j, Color.FromArgb(255, pixelBrightness, pixelBrightness, pixelBrightness));
+                        }
+                    }
                 }
 
                 counter++;
