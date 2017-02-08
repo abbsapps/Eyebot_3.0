@@ -16,7 +16,7 @@ namespace Eyebot3
         private Bitmap perceivedImage { get; set; }
         private Bitmap realImage { get; set; }
         private LaplaceFilter laplacer { get; set; }
-        private Dictionary<int, int> knownPixels { get; set; }
+        private Dictionary<int, Tuple<int, int>> knownPixels { get; set; } //Tuple is brightness, resolution
         private List<int> orderedBrightnesses { get; set; }
         private List<int> orderedPixels { get; set; }
         private int imageSize { get; set; }
@@ -29,7 +29,7 @@ namespace Eyebot3
             perceivedImage = new Bitmap(xSize, ySize);
             realImage = image;
             laplacer = new LaplaceFilter();
-            knownPixels = new Dictionary<int, int>();
+            knownPixels = new Dictionary<int, Tuple<int, int>>();
             orderedBrightnesses = new List<int>() { 0 };
             orderedPixels = new List<int>() { 0 };
             imageSize = image.Width * image.Height;
@@ -68,12 +68,16 @@ namespace Eyebot3
         {
             var directory = System.IO.Directory.GetCurrentDirectory();
             var counter = 0;
+            var pixelSpread = 6;
+            var surroundSpread = pixelSpread + 1;
+            var thresholdPower = 7;
+            var choicePower = 3;
+            var deviationRange = 20;
+            var counterThreshold = 10000;
+
             while (true)
             {
-                var pixelSpread = 2;
-                var surroundSpread = 3;
-
-                var nextLocationTuple = nextLocationStrategy(pixelSpread, 7, 2, 20);
+                var nextLocationTuple = nextLocationStrategy(pixelSpread, thresholdPower, choicePower, deviationRange);
                 int xLocation = nextLocationTuple.Item1;
                 int yLocation = nextLocationTuple.Item2;
 
@@ -91,7 +95,7 @@ namespace Eyebot3
                         orderedPixels.RemoveAt(listIndex);
                         orderedBrightnesses.RemoveAt(listIndex);
                     }
-                    knownPixels[pixelLocation] = pixelBrightness;
+                    knownPixels[pixelLocation] = new Tuple<int, int>(pixelBrightness, pixelSpread);
                     var listInsertLocation = orderedBrightnesses.BinarySearch(pixelBrightness);
                     if (listInsertLocation < 0)
                     {
@@ -110,9 +114,15 @@ namespace Eyebot3
                 }
 
                 counter++;
-                if(counter > 50000)
+                if(counter > counterThreshold)
                 {
                     counter = 0;
+
+                    counterThreshold += 10000;
+                    thresholdPower += 2;
+                    pixelSpread -= 1;
+                    surroundSpread -= 1;
+
                     perceivedImage.Save(directory + "/Images/laplacedTriangle.png");
                 }
             }
