@@ -35,18 +35,18 @@ namespace Eyebot3
             imageSize = image.Width * image.Height;
         }
 
-        private Tuple<int, int> nextLocationStrategy(int pixelSpread)
+        private Tuple<int, int> nextLocationStrategy(int pixelSpread, int thresholdPower, int choicePower, int deviationRange)
         {
-            var threshold = (Math.Pow(((float)(imageSize - orderedPixels.Count) / imageSize), 4));
+            var threshold = (Math.Pow(((float)(imageSize - orderedPixels.Count) / imageSize), thresholdPower));
             var dieRoll = die.NextDouble();
             if (dieRoll < threshold)
             {
                 return new Tuple<int, int>((int)(die.NextDouble() * xSize), (int)(die.NextDouble() * ySize));
             }
-            var entryChoice = (int)(Math.Pow(die.NextDouble(), 3) * orderedPixels.Count);
+            var entryChoice = (int)(Math.Pow(die.NextDouble(), choicePower) * orderedPixels.Count);
             var baseEntry = orderedPixels[orderedPixels.Count - entryChoice - 1];
-            var chosenX = (int)(die.NextDouble() * 20 * pixelSpread - 10 * pixelSpread);
-            var chosenY = (int)(die.NextDouble() * 20 * pixelSpread - 10 * pixelSpread);
+            var chosenX = (int)(die.NextDouble() * deviationRange * pixelSpread - 10 * pixelSpread);
+            var chosenY = (int)(die.NextDouble() * deviationRange * pixelSpread - 10 * pixelSpread);
             var chosenEntry = new Tuple<int, int>(baseEntry.Item1 + chosenX, baseEntry.Item2 + chosenY);
             return chosenEntry;
         }
@@ -57,10 +57,10 @@ namespace Eyebot3
             var counter = 0;
             while (true)
             {
-                var pixelSpread = 3;
-                var surroundSpread = 5;
+                var pixelSpread = 2;
+                var surroundSpread = 3;
 
-                var nextLocationTuple = nextLocationStrategy(pixelSpread);
+                var nextLocationTuple = nextLocationStrategy(pixelSpread, 7, 2, 20);
                 int xLocation = nextLocationTuple.Item1;
                 int yLocation = nextLocationTuple.Item2;
 
