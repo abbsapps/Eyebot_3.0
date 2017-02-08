@@ -35,16 +35,18 @@ namespace Eyebot3
             imageSize = image.Width * image.Height;
         }
 
-        public Tuple<int, int> nextLocationStrategy()
+        private Tuple<int, int> nextLocationStrategy(int pixelSpread)
         {
-            if(die.NextDouble() * imageSize > knownPixels.Count)
+            var threshold = (Math.Pow(((float)(imageSize - orderedPixels.Count) / imageSize), 4));
+            var dieRoll = die.NextDouble();
+            if (dieRoll < threshold)
             {
                 return new Tuple<int, int>((int)(die.NextDouble() * xSize), (int)(die.NextDouble() * ySize));
             }
             var entryChoice = (int)(Math.Pow(die.NextDouble(), 3) * orderedPixels.Count);
             var baseEntry = orderedPixels[orderedPixels.Count - entryChoice - 1];
-            var chosenX = (int)(die.NextDouble() * 20 - 10);
-            var chosenY = (int)(die.NextDouble() * 20 - 10);
+            var chosenX = (int)(die.NextDouble() * 20 * pixelSpread - 10 * pixelSpread);
+            var chosenY = (int)(die.NextDouble() * 20 * pixelSpread - 10 * pixelSpread);
             var chosenEntry = new Tuple<int, int>(baseEntry.Item1 + chosenX, baseEntry.Item2 + chosenY);
             return chosenEntry;
         }
@@ -55,14 +57,12 @@ namespace Eyebot3
             var counter = 0;
             while (true)
             {
-                //int xLocation = (int)(die.NextDouble() * xSize);
-                //int yLocation = (int)(die.NextDouble() * ySize);
-                var nextLocationTuple = nextLocationStrategy();
+                var pixelSpread = 3;
+                var surroundSpread = 5;
+
+                var nextLocationTuple = nextLocationStrategy(pixelSpread);
                 int xLocation = nextLocationTuple.Item1;
                 int yLocation = nextLocationTuple.Item2;
-
-                var pixelSpread = 2;
-                var surroundSpread = 3;
 
                 var pixelBrightness = laplacer.getLaplaceVal(pixelSpread, surroundSpread, .5, xLocation, yLocation, realImage);
 
