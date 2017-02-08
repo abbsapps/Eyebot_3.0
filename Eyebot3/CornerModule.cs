@@ -16,9 +16,9 @@ namespace Eyebot3
         private Bitmap perceivedImage { get; set; }
         private Bitmap realImage { get; set; }
         private LaplaceFilter laplacer { get; set; }
-        private Dictionary<Tuple<int, int>, int> knownPixels { get; set; }
+        private Dictionary<int, int> knownPixels { get; set; }
         private List<int> orderedBrightnesses { get; set; }
-        private List<Tuple<int, int>> orderedPixels { get; set; }
+        private List<int> orderedPixels { get; set; }
         private int imageSize { get; set; }
 
         public CornerModule(Bitmap image)
@@ -29,9 +29,9 @@ namespace Eyebot3
             perceivedImage = new Bitmap(xSize, ySize);
             realImage = image;
             laplacer = new LaplaceFilter();
-            knownPixels = new Dictionary<Tuple<int, int>, int>();
+            knownPixels = new Dictionary<int, int>();
             orderedBrightnesses = new List<int>() { 0 };
-            orderedPixels = new List<Tuple<int, int>>() { new Tuple<int, int>(0,0)};
+            orderedPixels = new List<int>() { 0 };
             imageSize = image.Width * image.Height;
         }
 
@@ -47,8 +47,21 @@ namespace Eyebot3
             var baseEntry = orderedPixels[orderedPixels.Count - entryChoice - 1];
             var chosenX = (int)(die.NextDouble() * deviationRange * pixelSpread - 10 * pixelSpread);
             var chosenY = (int)(die.NextDouble() * deviationRange * pixelSpread - 10 * pixelSpread);
-            var chosenEntry = new Tuple<int, int>(baseEntry.Item1 + chosenX, baseEntry.Item2 + chosenY);
+
+            var chosenEntryInput = locationTranslatorFromInt(baseEntry);
+            var chosenEntry = new Tuple<int, int>(chosenEntryInput.Item1 + chosenX, chosenEntryInput.Item2 + chosenY);
             return chosenEntry;
+        }
+
+        public int locationTranslatorToInt(int xLocation, int yLocation)
+        {
+            return yLocation * xSize + xLocation;
+        }
+        public Tuple<int, int> locationTranslatorFromInt(int intLocation)
+        {
+            var yLocation = (intLocation / xSize);
+            var xLocation = intLocation - yLocation * xSize;
+            return new Tuple<int, int>(xLocation, yLocation);
         }
 
         public void laplaceCaller()
@@ -68,7 +81,10 @@ namespace Eyebot3
 
                 if (xLocation >= pixelSpread && yLocation >= pixelSpread && xLocation < xSize - pixelSpread && yLocation < ySize - pixelSpread)
                 {
-                    var pixelLocation = new Tuple<int, int>(xLocation, yLocation);
+                    var pixelLocation = locationTranslatorToInt(xLocation, yLocation);
+                    //replace with unit test
+                    var testReversal = locationTranslatorFromInt(pixelLocation);
+                    //end replace
                     if (knownPixels.ContainsKey(pixelLocation))
                     {
                         var listIndex = orderedPixels.IndexOf(pixelLocation);
