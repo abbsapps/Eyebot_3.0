@@ -88,7 +88,7 @@ namespace Eyebot3
                     {
                         for (int j = -1 * pixelSpread + 1; j < pixelSpread; j++)
                         {
-                            perceivedImage.SetPixel(xLocation + 1, yLocation + j, Color.FromArgb(255, pixelBrightness, pixelBrightness, pixelBrightness));
+                            perceivedImage.SetPixel(xLocation + i, yLocation + j, Color.FromArgb(255, pixelBrightness, pixelBrightness, pixelBrightness));
                         }
                     }
                 }
