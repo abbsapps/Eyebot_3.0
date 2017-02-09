@@ -12,7 +12,7 @@ namespace Eyebot3
          static void Main(string[] args)
         {
             LaplaceFilter laplaceFilter = new LaplaceFilter();
-            Image environmentImage = Image.FromFile(System.IO.Directory.GetCurrentDirectory() + "/Images/eye.jpg");
+            Image environmentImage = Image.FromFile(System.IO.Directory.GetCurrentDirectory() + "/Images/triangles.png");
             Bitmap mappedImage = new Bitmap(environmentImage);
             Bitmap copiedImage = new Bitmap(environmentImage.Width, environmentImage.Height);
             Bitmap doubleCopiedImage = new Bitmap(environmentImage.Width, environmentImage.Height);
