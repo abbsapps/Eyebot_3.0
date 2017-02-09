@@ -17,8 +17,8 @@ namespace Eyebot3
             Bitmap copiedImage = new Bitmap(environmentImage.Width, environmentImage.Height);
             Bitmap doubleCopiedImage = new Bitmap(environmentImage.Width, environmentImage.Height);
 
-            var cornerModule = new CornerModule(mappedImage);
-            cornerModule.laplaceCaller();
+            var laplaceCaller = new LaplaceCaller(mappedImage);
+            var cornerModule = new CornerModule(laplaceCaller);
         }
     }
 }
