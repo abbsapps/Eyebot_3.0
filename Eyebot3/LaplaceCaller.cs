@@ -13,7 +13,7 @@ namespace Eyebot3
         private int xSize { get; set; }
         private int ySize { get; set; }
         private Random die { get; set; }
-        private Bitmap perceivedImage { get; set; }
+        public Bitmap perceivedImage { get; set; }
         private Bitmap realImage { get; set; }
         private LaplaceFilter laplacer { get; set; }
         private Dictionary<int, Tuple<int, int>> knownPixels { get; set; } //Tuple is brightness, resolution

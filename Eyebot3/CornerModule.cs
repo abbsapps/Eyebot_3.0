@@ -9,13 +9,64 @@ namespace Eyebot3
 {
     public class CornerModule
     {
+        private int xSize { get; set; }
+        private int ySize { get; set; }
+        private Random die { get; set; }
+        private Bitmap perceivedImage { get; set; } //cornered one
+        private Bitmap realImage { get; set; } //laplaced one
+        private LaplaceFilter laplacer { get; set; }
+        private Dictionary<int, Tuple<int, int>> knownPixels { get; set; } //Tuple is brightness, resolution
+        private List<int> orderedBrightnesses { get; set; }
+        private List<int> orderedPixels { get; set; }
+        private int imageSize { get; set; }
+
+        public int PixelSpread { get; set; }
+        public int SurroundSpread { get; set; }
+        public int ThresholdPower { get; set; }
+        public int ChoicePower { get; set; }
+        public int DeviationRange { get; set; }
+        public int CounterThreshold { get; set; }
+
+
+
+
         private LaplaceCaller laplaceCaller { get; set; }
         public CornerModule(LaplaceCaller caller)
         {
+            var image = caller.perceivedImage;
+            xSize = image.Size.Width;
+            ySize = image.Size.Height;
+            die = new Random();
+            perceivedImage = new Bitmap(xSize, ySize);
+            realImage = image;
+            laplacer = new LaplaceFilter();
+            knownPixels = new Dictionary<int, Tuple<int, int>>();
+            orderedBrightnesses = new List<int>() { 0 };
+            orderedPixels = new List<int>() { 0 };
+            imageSize = image.Width * image.Height;
+
+
+
             laplaceCaller = caller;
             for (int i = 6; i > 0; i--) {
                 laplaceCaller.callLaplace(i, i + 1, 7, 3, 20, 10000);
             }
+
+            callCorner(2, 3, 1, 1, 1, 1);
+        }
+
+        public void callCorner(int pixelSpread, int surroundSpread, int thresholdPower, int choicePower, int deviationRange, int counterThreshold)
+        {
+            for (int i = 0; i < 100000; i++) {
+                var randomEntryChoice = new Tuple<int, int>((int)(die.NextDouble() * xSize), (int)(die.NextDouble() * ySize));
+
+                var cornerMatch = getCornerVal(pixelSpread, surroundSpread, (int)(die.NextDouble() * 360), (int)(die.NextDouble() * 360), 1, randomEntryChoice.Item1, randomEntryChoice.Item2, realImage);
+
+                var sharpened = (int)(Math.Pow((cornerMatch / 255.0), .3) * 255.0);
+                perceivedImage.SetPixel(randomEntryChoice.Item1, randomEntryChoice.Item2, Color.FromArgb(255, sharpened, sharpened, sharpened));
+            }
+            var directory = System.IO.Directory.GetCurrentDirectory();
+            perceivedImage.Save(directory + "/Images/corneredTriangle" + PixelSpread.ToString() + ".png");
         }
 
         private int getBrightness(Color pixel)
@@ -31,7 +82,7 @@ namespace Eyebot3
             //insert logic for getting surround contrast
             var surroundContrast = 0;
             //end empty logic
-            return cornerAreaMatch + baseArmMatch + otherArmMatch;
+            return (int)((cornerAreaMatch + baseArmMatch + otherArmMatch)/3.0);
         }
 
         private int getCornerMatchBrightness(int getResolution, int xLoc, int yLoc, Bitmap image)
@@ -89,7 +140,7 @@ namespace Eyebot3
 
                     if (adjustedXLocation >= 0 && adjustedYLocation >= 0 && adjustedXLocation < image.Width && adjustedYLocation < image.Height)
                     {
-                        sumGetBrightness += getBrightness(image.GetPixel(xLoc + i, yLoc + j));
+                        sumGetBrightness += getBrightness(image.GetPixel(adjustedXLocation, adjustedYLocation));
                     }
                     else
                     {
