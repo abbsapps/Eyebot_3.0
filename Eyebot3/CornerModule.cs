@@ -55,15 +55,57 @@ namespace Eyebot3
             callCorner(2, 3, 1, 1, 1, 1);
         }
 
+        private void drawCorner(int resolution, int angle, int orientation, int armExtensionMultiplier, int xLoc, int yLoc, int brightness, Bitmap image)
+        {
+            double orientationRadians = orientation * (Math.PI / 180);
+            drawArm(resolution, armExtensionMultiplier, orientationRadians, xLoc, yLoc, brightness, image);
+
+            double rotationRadians = angle * (Math.PI / 180);
+
+            double adjustedRadians = rotationRadians - orientationRadians > 0 ?
+                rotationRadians - orientationRadians : 360 + (rotationRadians - orientationRadians);
+
+            drawArm(resolution, armExtensionMultiplier, adjustedRadians, xLoc, yLoc, brightness, image);    
+        }
+
+        private void drawArm(int resolution, int armExtensionMultiplier, double rotationRadians, int xLoc, int yLoc, int brightness, Bitmap image)
+        {
+            double cosTheta = Math.Cos(rotationRadians);
+            double sinTheta = Math.Sin(rotationRadians);
+
+            for (int i = -1 * resolution + 1; i < resolution * armExtensionMultiplier; i++)
+            {
+                for (int j = -1 * resolution + 1; j < resolution; j++)
+                {
+                    var xLocation = xLoc + i;
+                    var yLocation = yLoc + j;
+
+                    var adjustedXLocation = (int)(cosTheta * (xLocation - xLoc) -
+                        sinTheta * (yLocation - yLoc) + xLoc);
+
+                    var adjustedYLocation = (int)(sinTheta * (xLocation - xLoc) +
+                        cosTheta * (yLocation - yLoc) + yLoc);
+
+                    if (adjustedXLocation >= 0 && adjustedYLocation >= 0 && adjustedXLocation < image.Width && adjustedYLocation < image.Height)
+                    {
+                        image.SetPixel(adjustedXLocation, adjustedYLocation, Color.FromArgb(255, brightness, brightness, brightness));
+                    }
+                }
+            }
+        }
+
         public void callCorner(int pixelSpread, int surroundSpread, int thresholdPower, int choicePower, int deviationRange, int counterThreshold)
         {
-            for (int i = 0; i < 100000; i++) {
+            for (int i = 0; i < 2000; i++) {
                 var randomEntryChoice = new Tuple<int, int>((int)(die.NextDouble() * xSize), (int)(die.NextDouble() * ySize));
+                var angle = (int)(die.NextDouble() * 360);
+                var orientation = (int)(die.NextDouble() * 360);
 
-                var cornerMatch = getCornerVal(pixelSpread, surroundSpread, (int)(die.NextDouble() * 360), (int)(die.NextDouble() * 360), 1, randomEntryChoice.Item1, randomEntryChoice.Item2, realImage);
+                var cornerMatch = getCornerVal(pixelSpread, surroundSpread, angle, orientation, 1, randomEntryChoice.Item1, randomEntryChoice.Item2, realImage);
 
                 var sharpened = (int)(Math.Pow((cornerMatch / 255.0), .3) * 255.0);
-                perceivedImage.SetPixel(randomEntryChoice.Item1, randomEntryChoice.Item2, Color.FromArgb(255, sharpened, sharpened, sharpened));
+                drawCorner(pixelSpread, angle, orientation, 5, randomEntryChoice.Item1, randomEntryChoice.Item2, sharpened, perceivedImage);
+                //perceivedImage.SetPixel(randomEntryChoice.Item1, randomEntryChoice.Item2, Color.FromArgb(255, sharpened, sharpened, sharpened));
             }
             var directory = System.IO.Directory.GetCurrentDirectory();
             perceivedImage.Save(directory + "/Images/corneredTriangle" + PixelSpread.ToString() + ".png");
@@ -77,8 +119,8 @@ namespace Eyebot3
         public int getCornerVal(int centerResolution, int surroundResolution, int angle, int orientation, double sharpenValue, int xLoc, int yLoc, Bitmap image)
         {
             var cornerAreaMatch = getCornerMatchBrightness(centerResolution, xLoc, yLoc, image);
-            var baseArmMatch = getArmMatchBrightness(centerResolution, 0, orientation, xLoc, yLoc, image);
-            var otherArmMatch = getArmMatchBrightness(centerResolution, angle, orientation, xLoc, yLoc, image);
+            var baseArmMatch = getArmMatchBrightness(centerResolution, 0, orientation, xLoc, yLoc, 5, image);
+            var otherArmMatch = getArmMatchBrightness(centerResolution, angle, orientation, xLoc, yLoc, 5, image);
             //insert logic for getting surround contrast
             var surroundContrast = 0;
             //end empty logic
@@ -109,12 +151,11 @@ namespace Eyebot3
 
 
 
-        private int getArmMatchBrightness(int getResolution, int angle, int orientation, int xLoc, int yLoc, Bitmap image)
+        private int getArmMatchBrightness(int getResolution, int angle, int orientation, int xLoc, int yLoc, int armExtensionMultiplier, Bitmap image)
         {
-            var armExtentionMultiplier = 5;
 
             var sumGetBrightness = 0;
-            var getArmPixelCount = Math.Pow(getResolution * 2 - 1, 2) * armExtentionMultiplier; //is this multiplication valid?  probably not - look into
+            var getArmPixelCount = Math.Pow(getResolution * 2 - 1, 2) * armExtensionMultiplier; //is this multiplication valid?  probably not - look into
 
             double orientationRadians = orientation * (Math.PI / 180);
             double rotationRadians = angle * (Math.PI / 180);
@@ -125,12 +166,12 @@ namespace Eyebot3
             double cosTheta = Math.Cos(adjustedRadians);
             double sinTheta = Math.Sin(adjustedRadians);
 
-            for (int i = -1 * getResolution + 1; i < getResolution * armExtentionMultiplier; i++)
+            for (int i = -1 * getResolution + 1; i < getResolution * armExtensionMultiplier; i++)
             {
                 for (int j = -1 * getResolution + 1; j < getResolution; j++)
                 {
                     var xLocation = xLoc + i;
-                    var yLocation = yLoc + i;
+                    var yLocation = yLoc + j;
 
                     var adjustedXLocation = (int)(cosTheta * (xLocation - xLoc) -
                         sinTheta * (yLocation - yLoc) + xLoc);
@@ -150,5 +191,6 @@ namespace Eyebot3
             }
             return (int)(sumGetBrightness / getArmPixelCount);
         }
+
     }
 }
