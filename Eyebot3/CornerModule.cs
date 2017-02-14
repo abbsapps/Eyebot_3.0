@@ -48,11 +48,23 @@ namespace Eyebot3
 
 
             laplaceCaller = caller;
-            for (int i = 6; i > 0; i--) {
-                laplaceCaller.callLaplace(i, i + 1, 7, 3, 20, 10000);
-            }
+            //for (int i = 6; i > 0; i--) {
+            //    laplaceCaller.callLaplace(i, i + 1, 7, 3, 20, 10000);
+            //}
 
-            callCorner(2, 3, 1, 1, 1, 1);
+            //experimental call to test out corner fill + surround via drawing
+            for (int i = 0; i < 200; i++)
+            {
+                var randomEntryChoice = new Tuple<int, int>((int)(die.NextDouble() * xSize), (int)(die.NextDouble() * ySize));
+                var angle = (int)(die.NextDouble() * 360);
+                var orientation = (int)(die.NextDouble() * 360);
+                experimentalDrawCorner(2, angle, orientation, 5, randomEntryChoice.Item1, randomEntryChoice.Item2, 255, perceivedImage);
+            }
+            var directory = System.IO.Directory.GetCurrentDirectory();
+            perceivedImage.Save(directory + "/Images/experimentalCorneredTriangle" + PixelSpread.ToString() + ".png");
+            //end experimental call
+
+            //callCorner(2, 3, 1, 1, 1, 1);
         }
 
         private void drawCorner(int resolution, int angle, int orientation, int armExtensionMultiplier, int xLoc, int yLoc, int brightness, Bitmap image)
@@ -192,5 +204,76 @@ namespace Eyebot3
             return (int)(sumGetBrightness / getArmPixelCount);
         }
 
+
+
+
+
+
+        private void experimentalDrawCorner(int resolution, int angle, int orientation, int armExtensionMultiplier, int xLoc, int yLoc, int brightness, Bitmap image)
+        {
+            int superResolution = armExtensionMultiplier * resolution;
+
+            for (int i = -1 * superResolution; i < superResolution; i++)
+            {
+                for(int j = -1 * superResolution; j < superResolution; j++)
+                {
+                    var xLocation = xLoc + i;
+                    var yLocation = yLoc + j;
+                    if(xLocation > 0 && yLocation > 0 && xLocation < image.Width && yLocation < image.Height)
+                    {
+                        var noHit = true;
+                        //fill in center
+                        if(i > -1 * resolution && i < resolution && j > -1 * resolution && j < resolution)
+                        {
+                            perceivedImage.SetPixel(xLocation, yLocation, Color.FromArgb(255, 255, 255, 255));
+                            noHit = false;
+                        }
+                        //fill in orientation arm
+                        double orientationRadians = orientation * (Math.PI / 180);
+
+                        double cosTheta = Math.Cos(orientationRadians);
+                        double sinTheta = Math.Sin(orientationRadians);
+
+                        var adjustedXLocation = (int)(cosTheta * (xLocation - xLoc) -
+                        sinTheta * (yLocation - yLoc) + xLoc);
+
+                        var adjustedYLocation = (int)(sinTheta * (xLocation - xLoc) +
+                            cosTheta * (yLocation - yLoc) + yLoc);
+
+                        if (adjustedXLocation >= xLoc - resolution && adjustedYLocation >= yLoc - resolution && adjustedYLocation < yLoc + resolution)
+                        {
+                            perceivedImage.SetPixel(xLocation, yLocation, Color.FromArgb(255, 255, 255, 255));
+                            noHit = false;
+                        }
+
+                        //fill in angle arm
+                        double rotationRadians = angle * (Math.PI / 180);
+
+                        double adjustedRadians = rotationRadians - orientationRadians > 0 ?
+                            rotationRadians - orientationRadians : 360 + (rotationRadians - orientationRadians);
+
+                        cosTheta = Math.Cos(adjustedRadians);
+                        sinTheta = Math.Sin(adjustedRadians);
+
+                        adjustedXLocation = (int)(cosTheta * (xLocation - xLoc) -
+                        sinTheta * (yLocation - yLoc) + xLoc);
+
+                        adjustedYLocation = (int)(sinTheta * (xLocation - xLoc) +
+                            cosTheta * (yLocation - yLoc) + yLoc);
+
+                        if (adjustedXLocation >= xLoc - resolution && adjustedYLocation >= yLoc - resolution && adjustedYLocation < yLoc + resolution)
+                        {
+                            perceivedImage.SetPixel(xLocation, yLocation, Color.FromArgb(255, 255, 255, 255));
+                            noHit = false;
+                        }
+
+                        if (noHit)
+                        {
+                            perceivedImage.SetPixel(xLocation, yLocation, Color.FromArgb(255, 0, 0, 0));
+                        }
+                    }
+                }
+            }
+        }
     }
 }
