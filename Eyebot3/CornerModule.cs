@@ -51,25 +51,12 @@ namespace Eyebot3
             for (int i = 6; i > 0; i--) {
                 laplaceCaller.callLaplace(i, i + 1, 7, 3, 20, 10000);
             }
-
-            //experimental call to test out corner fill + surround via drawing
-            //for (int i = 0; i < 200; i++)
-            //{
-            //    var randomEntryChoice = new Tuple<int, int>((int)(die.NextDouble() * xSize), (int)(die.NextDouble() * ySize));
-            //    var angle = (int)(die.NextDouble() * 360);
-            //    var orientation = (int)(die.NextDouble() * 360);
-            //    experimentalDrawCorner(2, 2, angle, orientation, 5, randomEntryChoice.Item1, randomEntryChoice.Item2, 255, perceivedImage);
-            //}
-            //var directory = System.IO.Directory.GetCurrentDirectory();
-            //perceivedImage.Save(directory + "/Images/experimentalCorneredTriangle" + PixelSpread.ToString() + ".png");
-            //end experimental call
-
             callCorner(2, 2, 1, 1, 1, 1);
         }
 
         public void callCorner(int pixelSpread, int surroundSpread, int thresholdPower, int choicePower, int deviationRange, int counterThreshold)
         {
-            for (int i = 0; i < 2000; i++) {
+            for (int i = 0; i < 20000; i++) {
                 var randomEntryChoice = new Tuple<int, int>((int)(die.NextDouble() * xSize), (int)(die.NextDouble() * ySize));
                 var angle = (int)(die.NextDouble() * 360);
                 var orientation = (int)(die.NextDouble() * 360);
@@ -102,16 +89,16 @@ namespace Eyebot3
 
             double orientationRadians = orientation * (Math.PI / 180);
 
-            double cosTheta = Math.Cos(orientationRadians);
-            double sinTheta = Math.Sin(orientationRadians);
+            double orientationCosTheta = Math.Cos(orientationRadians);
+            double orientationSinTheta = Math.Sin(orientationRadians);
 
             double rotationRadians = angle * (Math.PI / 180);
 
             double adjustedRadians = rotationRadians - orientationRadians > 0 ?
                 rotationRadians - orientationRadians : 360 + (rotationRadians - orientationRadians);
 
-            cosTheta = Math.Cos(adjustedRadians);
-            sinTheta = Math.Sin(adjustedRadians);
+            double rotationCosTheta = Math.Cos(adjustedRadians);
+            double rotationSinTheta = Math.Sin(adjustedRadians);
 
             int matchBrightness = 0;
             int surroundBrightness = 0;
@@ -128,17 +115,17 @@ namespace Eyebot3
                     {
                         var noHit = true;
 
-                        var adjustedBaseXLocation = (int)(cosTheta * (xLocation - xLoc) -
-                        sinTheta * (yLocation - yLoc) + xLoc);
+                        var adjustedBaseXLocation = (int)(orientationCosTheta * (xLocation - xLoc) -
+                        orientationSinTheta * (yLocation - yLoc) + xLoc);
 
-                        var adjustedBaseYLocation = (int)(sinTheta * (xLocation - xLoc) +
-                            cosTheta * (yLocation - yLoc) + yLoc);
+                        var adjustedBaseYLocation = (int)(orientationSinTheta * (xLocation - xLoc) +
+                            orientationCosTheta * (yLocation - yLoc) + yLoc);
 
-                        var adjustedRotationXLocation = (int)(cosTheta * (xLocation - xLoc) -
-                        sinTheta * (yLocation - yLoc) + xLoc);
+                        var adjustedRotationXLocation = (int)(rotationCosTheta * (xLocation - xLoc) -
+                        rotationSinTheta * (yLocation - yLoc) + xLoc);
 
-                        var adjustedRotationYLocation = (int)(sinTheta * (xLocation - xLoc) +
-                            cosTheta * (yLocation - yLoc) + yLoc);
+                        var adjustedRotationYLocation = (int)(rotationSinTheta * (xLocation - xLoc) +
+                            rotationCosTheta * (yLocation - yLoc) + yLoc);
 
                         //note: need a way to detect unset pixels to skipe them (i.e. set noHit if xLocation, yLocation is not set in input image)
                         if (noHit && adjustedBaseXLocation >= xLoc - resolution && adjustedBaseYLocation >= yLoc - resolution && adjustedBaseYLocation < yLoc + resolution)
@@ -182,7 +169,7 @@ namespace Eyebot3
             return new Tuple<List<Tuple<int, int>>, int>(fillInPixels, collatedValue);
         }
 
-
+        /*
         private void experimentalDrawCorner(int resolution, int surroundResolution, int angle, int orientation, int armExtensionMultiplier, int xLoc, int yLoc, int brightness, Bitmap image)
         {
             int superResolution = armExtensionMultiplier * resolution;
@@ -245,6 +232,6 @@ namespace Eyebot3
                     }
                 }
             }
-        }
+        }*/
     }
 }
