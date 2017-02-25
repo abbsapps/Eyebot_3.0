@@ -56,7 +56,7 @@ namespace Eyebot3
 
         public void callCorner(int pixelSpread, int surroundSpread, int thresholdPower, int choicePower, int deviationRange, int counterThreshold)
         {
-            for (int i = 0; i < 20000; i++) {
+            for (int i = 0; i < 2000; i++) {
                 var randomEntryChoice = new Tuple<int, int>((int)(die.NextDouble() * xSize), (int)(die.NextDouble() * ySize));
                 var angle = (int)(die.NextDouble() * 360);
                 var orientation = (int)(die.NextDouble() * 360);
@@ -87,19 +87,6 @@ namespace Eyebot3
 
             int superResolution = armExtensionMultiplier * resolution;
 
-            double orientationRadians = orientation * (Math.PI / 180);
-
-            double orientationCosTheta = Math.Cos(orientationRadians);
-            double orientationSinTheta = Math.Sin(orientationRadians);
-
-            double rotationRadians = angle * (Math.PI / 180);
-
-            double adjustedRadians = rotationRadians - orientationRadians > 0 ?
-                rotationRadians - orientationRadians : 360 + (rotationRadians - orientationRadians);
-
-            double rotationCosTheta = Math.Cos(adjustedRadians);
-            double rotationSinTheta = Math.Sin(adjustedRadians);
-
             int matchBrightness = 0;
             int surroundBrightness = 0;
             int matchPixelCount = 0;
@@ -115,20 +102,10 @@ namespace Eyebot3
                     {
                         var noHit = true;
 
-                        var adjustedBaseXLocation = (int)(orientationCosTheta * (xLocation - xLoc) -
-                        orientationSinTheta * (yLocation - yLoc) + xLoc);
-
-                        var adjustedBaseYLocation = (int)(orientationSinTheta * (xLocation - xLoc) +
-                            orientationCosTheta * (yLocation - yLoc) + yLoc);
-
-                        var adjustedRotationXLocation = (int)(rotationCosTheta * (xLocation - xLoc) -
-                        rotationSinTheta * (yLocation - yLoc) + xLoc);
-
-                        var adjustedRotationYLocation = (int)(rotationSinTheta * (xLocation - xLoc) +
-                            rotationCosTheta * (yLocation - yLoc) + yLoc);
-
+                        var rotatedBaseLocation = RotateLocation(0, orientation, xLoc, yLoc, i, j);
+                        var rotatedRotationLocation = RotateLocation(orientation, angle, xLoc, yLoc, i, j);
                         //note: need a way to detect unset pixels to skipe them (i.e. set noHit if xLocation, yLocation is not set in input image)
-                        if (noHit && adjustedBaseXLocation >= xLoc - resolution && adjustedBaseYLocation >= yLoc - resolution && adjustedBaseYLocation < yLoc + resolution)
+                        if (noHit && rotatedBaseLocation.Item1 >= xLoc - resolution && rotatedBaseLocation.Item2 >= yLoc - resolution && rotatedBaseLocation.Item2 < yLoc + resolution)
                         {
                             matchBrightness += (int)(realImage.GetPixel(xLocation, yLocation).GetBrightness() * 255.0);
                             if(matchBrightness > 0)
@@ -139,20 +116,21 @@ namespace Eyebot3
                             fillInPixels.Add(new Tuple<int, int>(xLocation, yLocation));
                             noHit = false;
                         }
-                        else if (noHit && adjustedRotationXLocation >= xLoc - resolution && adjustedRotationYLocation >= yLoc - resolution && adjustedRotationYLocation < yLoc + resolution)
+                        
+                        else if (noHit && rotatedRotationLocation.Item1 >= xLoc - resolution && rotatedRotationLocation.Item2 >= yLoc - resolution && rotatedRotationLocation.Item2 < yLoc + resolution)
                         {
                             matchBrightness += (int)(realImage.GetPixel(xLocation, yLocation).GetBrightness() * 255.0);
                             matchPixelCount += 1;
                             fillInPixels.Add(new Tuple<int, int>(xLocation, yLocation));
                             noHit = false;
                         }
-                        else if (noHit && adjustedBaseXLocation >= xLoc - (resolution + surroundResolution) && adjustedBaseYLocation >= yLoc - (resolution + surroundResolution) && adjustedBaseYLocation < yLoc + (resolution + surroundResolution))
+                        else if (noHit && rotatedBaseLocation.Item1 >= xLoc - (resolution + surroundResolution) && rotatedBaseLocation.Item2 >= yLoc - (resolution + surroundResolution) && rotatedBaseLocation.Item2 < yLoc + (resolution + surroundResolution))
                         {
                             surroundBrightness += (int)(realImage.GetPixel(xLocation, yLocation).GetBrightness() * 255.0);
                             surroundPixelCount += 1;
                             noHit = false;
                         }
-                        else if (noHit && adjustedRotationXLocation >= xLoc - (resolution + surroundResolution) && adjustedRotationYLocation >= yLoc - (resolution + surroundResolution) && adjustedRotationYLocation < yLoc + (resolution + surroundResolution))
+                        else if (noHit && rotatedRotationLocation.Item1 >= xLoc - (resolution + surroundResolution) && rotatedRotationLocation.Item2 >= yLoc - (resolution + surroundResolution) && rotatedRotationLocation.Item2 < yLoc + (resolution + surroundResolution))
                         {
                             surroundBrightness += (int)(realImage.GetPixel(xLocation, yLocation).GetBrightness() * 255.0);
                             surroundPixelCount += 1;
@@ -167,6 +145,27 @@ namespace Eyebot3
             var collatedValue = (int)(matchAverage - surroundAverage);
             collatedValue = collatedValue > 0 ? collatedValue : 0;
             return new Tuple<List<Tuple<int, int>>, int>(fillInPixels, collatedValue);
+        }
+
+
+        private Tuple<int, int> RotateLocation(int orientationAngle, int rotationAngle, int xCenter, int yCenter, int xOffset, int yOffset)
+        {
+            double orientationRadians = orientationAngle * (Math.PI / 180);
+            double rotationRadians = rotationAngle * (Math.PI / 180);
+
+            rotationRadians = rotationRadians - orientationRadians > 0 ?
+                rotationRadians - orientationRadians : 360 + (rotationRadians - orientationRadians);
+
+            double cosTheta = Math.Cos(rotationRadians);
+            double sinTheta = Math.Sin(rotationRadians);
+
+            var adjustedBaseXLocation = (int)(cosTheta * (xOffset) -
+                        sinTheta * (yOffset) + xCenter);
+
+            var adjustedBaseYLocation = (int)(sinTheta * (xOffset) +
+                cosTheta * (yOffset) + yCenter);
+
+            return new Tuple<int, int>(adjustedBaseXLocation, adjustedBaseYLocation);
         }
     }
 }
