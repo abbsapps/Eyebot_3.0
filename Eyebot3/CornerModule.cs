@@ -61,6 +61,11 @@ namespace Eyebot3
                 var angle = (int)(die.NextDouble() * 360);
                 var orientation = (int)(die.NextDouble() * 360);
 
+                //for debugging
+                orientation = 90;
+                angle = 90;
+                //end debugging
+
                 var cornerMatch = getCornerVal(pixelSpread, surroundSpread, 5, angle, orientation, 1, randomEntryChoice.Item1, randomEntryChoice.Item2, realImage);
                 if(cornerMatch.Item2 > 0)
                 {
@@ -71,6 +76,10 @@ namespace Eyebot3
                 {
                     perceivedImage.SetPixel(cornerMatch.Item1[j].Item1, cornerMatch.Item1[j].Item2, Color.FromArgb(255, sharpened, sharpened, sharpened));
                 }
+                //for debugging
+                var savePlace = System.IO.Directory.GetCurrentDirectory();
+                perceivedImage.Save(savePlace + "/Images/corneredTriangle" + PixelSpread.ToString() + ".png");
+                //end debugging
             }
             var directory = System.IO.Directory.GetCurrentDirectory();
             perceivedImage.Save(directory + "/Images/corneredTriangle" + PixelSpread.ToString() + ".png");
@@ -154,7 +163,7 @@ namespace Eyebot3
             double rotationRadians = rotationAngle * (Math.PI / 180);
 
             rotationRadians = rotationRadians - orientationRadians > 0 ?
-                rotationRadians - orientationRadians : 360 + (rotationRadians - orientationRadians);
+                rotationRadians - orientationRadians : (2*Math.PI) + (rotationRadians - orientationRadians);
 
             double cosTheta = Math.Cos(rotationRadians);
             double sinTheta = Math.Sin(rotationRadians);
