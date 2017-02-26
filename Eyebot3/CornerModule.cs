@@ -74,7 +74,7 @@ namespace Eyebot3
                 var sharpened = (int)(Math.Pow((cornerMatch.Item2 / 255.0), .3) * 255.0);
                 for (int j = 0; j < cornerMatch.Item1.Count; j++)
                 {
-                    perceivedImage.SetPixel(cornerMatch.Item1[j].Item1, cornerMatch.Item1[j].Item2, Color.FromArgb(255, sharpened, sharpened, sharpened));
+                    //perceivedImage.SetPixel(cornerMatch.Item1[j].Item1, cornerMatch.Item1[j].Item2, Color.FromArgb(255, sharpened, sharpened, sharpened));
                 }
                 //for debugging
                 var savePlace = System.IO.Directory.GetCurrentDirectory();
@@ -109,12 +109,12 @@ namespace Eyebot3
                     var yLocation = yLoc + j;
                     if (xLocation > 0 && yLocation > 0 && xLocation < image.Width && yLocation < image.Height)
                     {
-                        var noHit = true;
 
                         var rotatedBaseLocation = RotateLocation(0, orientation, xLoc, yLoc, i, j);
                         var rotatedRotationLocation = RotateLocation(orientation, angle, xLoc, yLoc, i, j);
-                        //note: need a way to detect unset pixels to skipe them (i.e. set noHit if xLocation, yLocation is not set in input image)
-                        if (noHit && rotatedBaseLocation.Item1 >= xLoc - resolution && rotatedBaseLocation.Item2 >= yLoc - resolution && rotatedBaseLocation.Item2 < yLoc + resolution)
+                        //note: need a way to detect unset pixels to skip them (i.e. set noHit if xLocation, yLocation is not set in input image)
+                        //check if rotated pixel location overlaps with base orientation line
+                        if (rotatedBaseLocation.Item1 >= xLoc - resolution && rotatedBaseLocation.Item2 >= yLoc - resolution && rotatedBaseLocation.Item2 < yLoc + resolution)
                         {
                             matchBrightness += (int)(realImage.GetPixel(xLocation, yLocation).GetBrightness() * 255.0);
                             if(matchBrightness > 0)
@@ -123,27 +123,37 @@ namespace Eyebot3
                             }
                             matchPixelCount += 1;
                             fillInPixels.Add(new Tuple<int, int>(xLocation, yLocation));
-                            noHit = false;
+                            //for debugging
+                            perceivedImage.SetPixel(xLocation, yLocation, Color.FromArgb(255, 125, 125, 125));
+                            //end debugging
                         }
-                        
-                        else if (noHit && rotatedRotationLocation.Item1 >= xLoc - resolution && rotatedRotationLocation.Item2 >= yLoc - resolution && rotatedRotationLocation.Item2 < yLoc + resolution)
+                        //check if rotated pixel location overlaps with angle (with respect to orientation) line
+                        else if (rotatedRotationLocation.Item1 >= xLoc - resolution && rotatedRotationLocation.Item2 >= yLoc - resolution && rotatedRotationLocation.Item2 < yLoc + resolution)
                         {
                             matchBrightness += (int)(realImage.GetPixel(xLocation, yLocation).GetBrightness() * 255.0);
                             matchPixelCount += 1;
                             fillInPixels.Add(new Tuple<int, int>(xLocation, yLocation));
-                            noHit = false;
+                            //for debugging
+                            perceivedImage.SetPixel(xLocation, yLocation, Color.FromArgb(255, 125, 125, 125));
+                            //end debugging
                         }
-                        else if (noHit && rotatedBaseLocation.Item1 >= xLoc - (resolution + surroundResolution) && rotatedBaseLocation.Item2 >= yLoc - (resolution + surroundResolution) && rotatedBaseLocation.Item2 < yLoc + (resolution + surroundResolution))
+                        //check if rotated pixel location is just outside the edge of the base orientation line
+                        else if (rotatedBaseLocation.Item1 >= xLoc - (resolution) && rotatedBaseLocation.Item2 < yLoc && rotatedBaseLocation.Item2 > yLoc - (resolution + surroundResolution))
                         {
                             surroundBrightness += (int)(realImage.GetPixel(xLocation, yLocation).GetBrightness() * 255.0);
                             surroundPixelCount += 1;
-                            noHit = false;
+                            //for debugging
+                            perceivedImage.SetPixel(xLocation, yLocation, Color.FromArgb(255, 0, 0, 0));
+                            //end debugging
                         }
-                        else if (noHit && rotatedRotationLocation.Item1 >= xLoc - (resolution + surroundResolution) && rotatedRotationLocation.Item2 >= yLoc - (resolution + surroundResolution) && rotatedRotationLocation.Item2 < yLoc + (resolution + surroundResolution))
+                        //check if rotated pixel location is just outside the edge of the angle line
+                        else if (rotatedRotationLocation.Item1 >= xLoc - (resolution) && rotatedRotationLocation.Item2 > yLoc && rotatedRotationLocation.Item2 < yLoc + (resolution + surroundResolution))
                         {
                             surroundBrightness += (int)(realImage.GetPixel(xLocation, yLocation).GetBrightness() * 255.0);
                             surroundPixelCount += 1;
-                            noHit = false;
+                            //for debugging
+                            perceivedImage.SetPixel(xLocation, yLocation, Color.FromArgb(255, 0, 0, 0));
+                            //end debugging
                         }
                     }
                 }
