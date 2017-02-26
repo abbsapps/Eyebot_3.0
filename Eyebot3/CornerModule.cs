@@ -62,8 +62,8 @@ namespace Eyebot3
                 var orientation = (int)(die.NextDouble() * 360);
 
                 //for debugging
-                orientation = 90;
-                angle = 90;
+                orientation = 180;
+                angle = 270;
                 //end debugging
 
                 var cornerMatch = getCornerVal(pixelSpread, surroundSpread, 5, angle, orientation, 1, randomEntryChoice.Item1, randomEntryChoice.Item2, realImage);
@@ -162,8 +162,8 @@ namespace Eyebot3
             double orientationRadians = orientationAngle * (Math.PI / 180);
             double rotationRadians = rotationAngle * (Math.PI / 180);
 
-            rotationRadians = rotationRadians - orientationRadians > 0 ?
-                rotationRadians - orientationRadians : (2*Math.PI) + (rotationRadians - orientationRadians);
+            rotationRadians = rotationRadians + orientationRadians <= (2*Math.PI) ?
+                rotationRadians + orientationRadians : (rotationRadians + orientationRadians) - (2*Math.PI);
 
             double cosTheta = Math.Cos(rotationRadians);
             double sinTheta = Math.Sin(rotationRadians);
